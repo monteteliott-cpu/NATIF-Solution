@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NATIF — Le film</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080D18;
+  --bg2:#0A1220;
+  --ink:#F2EBDC;
+  --muted:#7C8699;
+  --acc:#D8A24A;
+  --acc-soft:#E8C98A;
+  --acc-glow:rgba(216,162,74,.32);
+  --acc-dim:rgba(216,162,74,.14);
+  --green:#5FBF7A;
+  --warm:#D96F5C;
+  --line:rgba(242,235,220,.10);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --disp:'Fraunces',serif;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+
+/* ============ STAGE ============ */
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+
+#stage::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(242,235,220,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(242,235,220,.025) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 90% 80% at 50% 50%,black 30%,transparent 100%);
+}
+#halo{position:absolute;width:70vmax;height:70vmax;border-radius:50%;
+  background:radial-gradient(circle,rgba(216,162,74,.09),transparent 60%);
+  filter:blur(30px);pointer-events:none;
+}
+#stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.09) 3px 4px);
+}
+
+.scene{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:6vh 8vw;opacity:0;visibility:hidden;
+  transition:opacity .7s ease, visibility 0s .7s;
+}
+.scene.on{opacity:1;visibility:visible;transition:opacity .7s ease}
+
+/* ============ TYPO ============ */
+.eyebrow{
+  font-family:var(--mono);font-size:clamp(10px,1.1vw,13px);letter-spacing:.35em;
+  text-transform:uppercase;color:var(--acc);margin-bottom:3.2vh;
+  display:flex;align-items:center;gap:14px;
+}
+.eyebrow::before,.eyebrow::after{content:"";width:34px;height:1px;background:var(--acc);opacity:.5}
+
+.h-giant{
+  font-family:var(--disp);font-weight:900;line-height:.98;letter-spacing:-.01em;
+  font-size:clamp(38px,7.2vw,106px);text-wrap:balance;
+}
+.h-big{
+  font-family:var(--disp);font-weight:800;line-height:1.05;letter-spacing:-.008em;
+  font-size:clamp(28px,5vw,74px);text-wrap:balance;
+}
+.sub{
+  margin-top:3vh;font-weight:300;color:var(--muted);
+  font-size:clamp(14px,1.6vw,21px);max-width:56ch;line-height:1.6;
+}
+.acc{color:var(--acc)}
+em.it{font-style:italic;color:var(--acc-soft)}
+
+.rl{display:block;overflow:hidden}
+.rl>span{display:block;transform:translateY(112%);transition:transform .9s cubic-bezier(.16,1,.3,1)}
+.scene.on .rl>span{transform:translateY(0)}
+.scene.on .rl:nth-child(2)>span{transition-delay:.12s}
+.scene.on .rl:nth-child(3)>span{transition-delay:.24s}
+.scene.on .rl:nth-child(4)>span{transition-delay:.36s}
+
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.16,1,.3,1)}
+.scene.on .fade-up{opacity:1;transform:none}
+.scene.on .d1{transition-delay:.5s}
+.scene.on .d2{transition-delay:.75s}
+.scene.on .d3{transition-delay:1s}
+.scene.on .d4{transition-delay:1.25s}
+
+/* ============ S0 — BOOT ============ */
+#boot .term{
+  font-family:var(--mono);font-size:clamp(11px,1.3vw,15px);color:var(--muted);
+  text-align:left;min-height:9em;width:min(560px,84vw);
+}
+#boot .term .ok{color:var(--green)}
+#boot .term .cur::after{content:"▌";color:var(--acc);animation:blink .8s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+#boot .logo{
+  margin-top:5vh;font-family:var(--disp);font-weight:900;letter-spacing:.01em;
+  font-size:clamp(44px,7.5vw,104px);line-height:1;
+  opacity:0;transform:scale(.96);transition:opacity 1s .2s,transform 1.2s .2s cubic-bezier(.16,1,.3,1);
+}
+#boot.logo-in .logo{opacity:1;transform:none}
+#boot .logo .dot{color:var(--acc)}
+#boot .tagline{
+  margin-top:2.2vh;font-family:var(--mono);font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.45em;text-transform:uppercase;color:var(--muted);
+  opacity:0;transition:opacity 1s .8s;
+}
+#boot.logo-in .tagline{opacity:1}
+
+/* ============ S1 — LE CONSTAT (grille de modules) ============ */
+#bloat .h-big{margin-bottom:3.6vh}
+#bloat .grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:9px;
+  width:min(860px,88vw);
+}
+#bloat .tile{
+  font-family:var(--mono);font-size:clamp(8px,.95vw,11.5px);letter-spacing:.04em;
+  padding:clamp(8px,1.3vh,14px) 4px;border:1px solid var(--line);border-radius:8px;
+  color:var(--muted);background:rgba(242,235,220,.025);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transform:scale(.85);
+  transition:opacity .4s calc(var(--i)*.045s),transform .4s calc(var(--i)*.045s) cubic-bezier(.16,1,.3,1);
+}
+#bloat.on .tile{opacity:1;transform:none}
+/* extinction */
+#bloat.dim .tile{transition:opacity .8s,filter .8s,border-color .8s,box-shadow .8s,color .8s;transition-delay:calc(var(--i)*.012s)}
+#bloat.dim .tile:not(.keep){opacity:.10;filter:grayscale(1)}
+#bloat.dim .tile.keep{
+  opacity:1;color:var(--ink);border-color:var(--acc);
+  background:var(--acc-dim);box-shadow:0 0 26px -6px var(--acc-glow);
+}
+#bloat .verdict{
+  margin-top:4vh;opacity:0;transform:translateY(18px);
+  transition:opacity .8s,transform .8s cubic-bezier(.16,1,.3,1);
+}
+#bloat.dim .verdict{opacity:1;transform:none;transition-delay:.5s}
+#bloat .verdict .sub{margin-top:1.4vh}
+
+/* ============ S3 — MANIFESTO ============ */
+#manif .npnm{display:flex;gap:clamp(20px,5vw,80px);align-items:baseline;justify-content:center;flex-wrap:wrap}
+
+/* ============ S4 — PRODUIT ============ */
+.mock{
+  width:min(880px,88vw);border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(180deg,#0E1626,#0A101C);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.85),0 0 0 1px rgba(216,162,74,.07),0 0 120px -40px var(--acc-glow);
+  text-align:left;overflow:hidden;
+  opacity:0;transform:translateY(40px) perspective(1400px) rotateX(6deg);
+  transition:opacity .9s .3s,transform 1.2s .3s cubic-bezier(.16,1,.3,1);
+}
+.scene.on .mock{opacity:1;transform:none}
+.mock-bar{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);background:rgba(242,235,220,.02)}
+.mock-bar .d{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.mock-bar .ttl{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:6px;letter-spacing:.08em}
+.mock-bar .live{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.15em;display:flex;align-items:center;gap:6px}
+.mock-bar .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.mock-body{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;padding:16px}
+.panel{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:rgba(242,235,220,.015)}
+.panel h4{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.kpis{display:flex;gap:22px;flex-wrap:wrap}
+.kpi .v{font-family:var(--mono);font-size:clamp(18px,2.4vw,28px);font-weight:600}
+.kpi .l{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+svg.spark{width:100%;height:64px;margin-top:10px}
+svg.spark path{fill:none;stroke:var(--acc);stroke-width:2;stroke-dasharray:600;stroke-dashoffset:600}
+.scene.on svg.spark path{animation:draw 2.2s .9s forwards cubic-bezier(.4,0,.2,1)}
+svg.spark .area{fill:url(#gA);stroke:none;opacity:0;stroke-dasharray:none}
+.scene.on svg.spark .area{animation:fadein 1s 2.2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+.rows .r{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:12px;
+  opacity:0;transform:translateX(-14px);transition:all .6s cubic-bezier(.16,1,.3,1)}
+.scene.on .rows .r{opacity:1;transform:none}
+.scene.on .rows .r:nth-child(2){transition-delay:1s}.scene.on .rows .r:nth-child(3){transition-delay:1.15s}
+.scene.on .rows .r:nth-child(4){transition-delay:1.3s}.scene.on .rows .r:nth-child(5){transition-delay:1.45s}
+.rows .r:last-child{border:none}
+.tag{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:20px;letter-spacing:.08em}
+.t-acc{color:var(--acc);background:var(--acc-dim)}
+.t-green{color:var(--green);background:rgba(95,191,122,.12)}
+.t-warm{color:var(--warm);background:rgba(217,111,92,.13)}
+.rows .who{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.mock-cap{margin-top:3.4vh}
+
+/* ============ S5 — FEATURES ============ */
+#feat .words{display:flex;flex-direction:column;gap:.6vh;align-items:center}
+#feat .w{
+  font-family:var(--disp);font-weight:800;letter-spacing:-.008em;line-height:1.12;
+  font-size:clamp(24px,4.3vw,60px);color:var(--muted);
+  opacity:0;transform:translateY(20px);transition:all .7s cubic-bezier(.16,1,.3,1);
+}
+#feat.on .w{opacity:1;transform:none}
+#feat.on .w:nth-child(1){transition-delay:.2s}
+#feat.on .w:nth-child(2){transition-delay:.9s}
+#feat.on .w:nth-child(3){transition-delay:1.6s}
+#feat.on .w:nth-child(4){transition-delay:2.3s;color:var(--ink)}
+#feat.on .w:nth-child(4) em{color:var(--acc);font-style:italic}
+
+/* ============ S6 — IA ============ */
+#ia .orb-wrap{position:relative;width:clamp(150px,20vw,230px);height:clamp(150px,20vw,230px);margin-bottom:4.5vh}
+#ia .orb{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,rgba(248,224,170,.9),rgba(216,162,74,.35) 45%,rgba(216,162,74,.05) 70%);
+  filter:blur(2px);animation:breathe 4s ease-in-out infinite}
+#ia .ring{position:absolute;inset:-14%;border:1px solid rgba(216,162,74,.35);border-radius:50%;animation:spin 14s linear infinite}
+#ia .ring.r2{inset:-28%;border-color:rgba(216,162,74,.15);animation-duration:26s;animation-direction:reverse;border-style:dashed}
+@keyframes breathe{50%{transform:scale(1.07);filter:blur(4px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ S7 — SOUVERAINETÉ ============ */
+#souv .shield{width:clamp(120px,15vw,180px);margin-bottom:4vh}
+#souv .shield path.outline{fill:none;stroke:var(--acc);stroke-width:2;stroke-dasharray:700;stroke-dashoffset:700}
+#souv.on .shield path.outline{animation:draw 2s .3s forwards}
+#souv .shield path.lock{fill:var(--ink);opacity:0}
+#souv.on .shield path.lock{animation:fadein .8s 1.8s forwards}
+#souv .pill-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:3.5vh}
+#souv .pill{font-family:var(--mono);font-size:clamp(10px,1.1vw,13px);letter-spacing:.12em;
+  padding:10px 18px;border:1px solid var(--line);border-radius:40px;color:var(--muted)}
+#souv .pill b{color:var(--acc-soft);font-weight:500}
+
+/* ============ S8 — CTA ============ */
+#cta .btn{
+  margin-top:4.5vh;font-family:var(--mono);letter-spacing:.25em;text-transform:uppercase;
+  font-size:clamp(11px,1.2vw,14px);color:#14100A;background:var(--acc);
+  padding:18px 42px;border-radius:60px;border:none;cursor:pointer;font-weight:600;
+  box-shadow:0 0 0 0 var(--acc-glow);transition:box-shadow .4s,transform .3s;
+}
+#cta .btn:hover{box-shadow:0 0 60px 4px var(--acc-glow);transform:translateY(-2px)}
+#cta .micro{margin-top:2.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+
+/* ============ PLAYER ============ */
+#player{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:50;
+  display:flex;align-items:center;gap:16px;padding:12px 18px;
+  border:1px solid var(--line);border-radius:60px;
+  background:rgba(10,18,32,.72);backdrop-filter:blur(14px);
+}
+#pp{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(242,235,220,.04);
+  color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;transition:background .2s}
+#pp:hover{background:var(--acc-dim)}
+#pp svg{width:12px;height:12px;fill:var(--ink)}
+#segs{display:flex;gap:6px}
+.seg{width:clamp(20px,4.4vw,52px);height:4px;border-radius:3px;background:rgba(242,235,220,.14);cursor:pointer;position:relative;overflow:hidden}
+.seg i{position:absolute;inset:0;transform:scaleX(0);transform-origin:left;background:var(--acc);border-radius:3px;display:block}
+.seg:hover{background:rgba(242,235,220,.26)}
+#scount{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.15em;min-width:44px;text-align:center}
+
+.hud{position:fixed;font-family:var(--mono);font-size:10px;letter-spacing:.25em;color:rgba(242,235,220,.25);text-transform:uppercase;z-index:10}
+.hud.tl{top:22px;left:26px}.hud.tr{top:22px;right:26px}
+
+@media (max-width:640px){
+  .mock-body{grid-template-columns:1fr}
+  .hud{display:none}
+  #bloat .grid{grid-template-columns:repeat(4,1fr)}
+  #bloat .tile:nth-child(n+21){display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="hud tl" id="hudname">NATIF — FILM</div>
+<div class="hud tr" id="hudtime">00:00</div>
+
+<div id="stage">
+  <div id="halo"></div>
+
+  <!-- S0 : BOOT -->
+  <section class="scene" id="boot">
+    <div class="term" id="term"></div>
+    <div class="logo" id="logo">NATIF</div>
+    <div class="tagline">Internal SaaS — Tailor Made</div>
+  </section>
+
+  <!-- S1 : LE CONSTAT -->
+  <section class="scene" id="bloat">
+    <div class="eyebrow">Le constat</div>
+    <h1 class="h-big">
+      <span class="rl"><span>Les suites du marché : <b class="acc">120</b> modules.</span></span>
+    </h1>
+    <div class="grid" id="grid"></div>
+    <div class="verdict">
+      <h1 class="h-big">Vos équipes en utilisent <b class="acc">7</b>.</h1>
+      <p class="sub">Le reste ? De la complexité — facturée au mois.</p>
+    </div>
+  </section>
+
+  <!-- S2 : LA SOLUTION -->
+  <section class="scene" id="sol">
+    <div class="eyebrow">La réponse</div>
+    <h1 class="h-giant">
+      <span class="rl"><span>Une solution <span class="acc">1:1</span>.</span></span>
+      <span class="rl"><span><em class="it">Tailor made.</em></span></span>
+      <span class="rl"><span>Intégrée <span class="acc">chez vous</span>.</span></span>
+    </h1>
+    <p class="sub fade-up d4">Un SaaS interne conçu autour de vos process — pas l'inverse. Construit avec vos équipes, pour vos équipes.</p>
+  </section>
+
+  <!-- S3 : MANIFESTO -->
+  <section class="scene" id="manif">
+    <div class="eyebrow">Le principe</div>
+    <div class="npnm">
+      <h1 class="h-giant"><span class="rl"><span>Ni plus.</span></span></h1>
+      <h1 class="h-giant"><span class="rl"><span>Ni moins.</span></span></h1>
+    </div>
+    <h1 class="h-big fade-up d2" style="margin-top:2vh"><em class="it">Exactement</em> ce qu'il vous faut.</h1>
+    <p class="sub fade-up d4">Chaque écran, chaque champ, chaque workflow existe parce que vos équipes en ont besoin. Zéro superflu. Zéro manque.</p>
+  </section>
+
+  <!-- S4 : PRODUIT / COORDINATION -->
+  <section class="scene" id="prod">
+    <div class="eyebrow">Coordination d'équipes</div>
+    <div class="mock">
+      <div class="mock-bar">
+        <span class="d"></span><span class="d"></span><span class="d"></span>
+        <span class="ttl">NATIF·CONSOLE — Vue d'ensemble</span>
+        <span class="live">LIVE</span>
+      </div>
+      <div class="mock-body">
+        <div class="panel">
+          <h4>Activité consolidée</h4>
+          <div class="kpis">
+            <div class="kpi"><div class="v acc">23</div><div class="l">Projets actifs</div></div>
+            <div class="kpi"><div class="v">94 %</div><div class="l">Échéances tenues</div></div>
+            <div class="kpi"><div class="v" style="color:var(--green)">+18 %</div><div class="l">Activité vs T-1</div></div>
+          </div>
+          <svg class="spark" viewBox="0 0 300 64" preserveAspectRatio="none">
+            <defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(216,162,74,.28)"/><stop offset="1" stop-color="rgba(216,162,74,0)"/>
+            </linearGradient></defs>
+            <path class="area" d="M0,54 L30,48 L60,50 L90,40 L120,42 L150,32 L180,34 L210,24 L240,26 L270,14 L300,10 L300,64 L0,64 Z"/>
+            <path d="M0,54 L30,48 L60,50 L90,40 L120,42 L150,32 L180,34 L210,24 L240,26 L270,14 L300,10"/>
+          </svg>
+        </div>
+        <div class="panel rows">
+          <h4>En cours dans vos équipes</h4>
+          <div class="r"><span class="tag t-acc">CAMPAGNE</span> Lancement offre Q3 <span class="who">MARKETING</span></div>
+          <div class="r"><span class="tag t-green">GO</span> Proposition client validée <span class="who">VENTES</span></div>
+          <div class="r"><span class="tag t-warm">REVIEW</span> Budget prévisionnel <span class="who">DIRECTION</span></div>
+          <div class="r"><span class="tag t-acc">SYNC</span> Veille marché <span class="who">AUTO·IA</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="sub mock-cap fade-up d3">Ventes, marketing, projets, direction — la même donnée, le même écran, en temps réel.</p>
+  </section>
+
+  <!-- S5 : FEATURES -->
+  <section class="scene" id="feat">
+    <div class="eyebrow">Ce que vos équipes obtiennent</div>
+    <div class="words">
+      <div class="w">Mise en place de campagnes.</div>
+      <div class="w">Suivi d'activité unifié.</div>
+      <div class="w">Reporting instantané.</div>
+      <div class="w">Le tout, <em>dans votre langage métier.</em></div>
+    </div>
+  </section>
+
+  <!-- S6 : IA -->
+  <section class="scene" id="ia">
+    <div class="orb-wrap">
+      <div class="ring"></div><div class="ring r2"></div><div class="orb"></div>
+    </div>
+    <h1 class="h-big">
+      <span class="rl"><span>L'<span class="acc">IA</span> intégrée,</span></span>
+      <span class="rl"><span>là où elle est utile.</span></span>
+    </h1>
+    <p class="sub fade-up d3">Synthèses automatiques, veille scorée, priorisation des opportunités. Pas un gadget — un copilote calibré sur vos données.</p>
+  </section>
+
+  <!-- S7 : SOUVERAINETÉ -->
+  <section class="scene" id="souv">
+    <svg class="shield" viewBox="0 0 100 116">
+      <path class="outline" d="M50 4 L92 20 V56 C92 84 74 102 50 112 C26 102 8 84 8 56 V20 Z"/>
+      <path class="lock" d="M50 44 a11 11 0 0 1 11 11 v6 h4 v22 H35 v-22 h4 v-6 a11 11 0 0 1 11-11 z m0 7 a4.5 4.5 0 0 0 -4.5 4.5 v5.5 h9 v-5.5 A4.5 4.5 0 0 0 50 51 z"/>
+    </svg>
+    <h1 class="h-giant">
+      <span class="rl"><span>Souveraineté</span></span>
+      <span class="rl"><span>totale.</span></span>
+    </h1>
+    <p class="sub fade-up d3">Hébergé en interne. Vos données restent dans vos murs. Aucune dépendance à un éditeur tiers, aucun abonnement subi.</p>
+    <div class="pill-row fade-up d4">
+      <span class="pill"><b>100 %</b> propriété</span>
+      <span class="pill"><b>0</b> licence / user</span>
+      <span class="pill">Hébergement <b>interne</b></span>
+      <span class="pill">Code <b>livré</b></span>
+    </div>
+  </section>
+
+  <!-- S8 : CTA -->
+  <section class="scene" id="cta">
+    <div class="eyebrow" id="ctaname">NATIF</div>
+    <h1 class="h-giant">
+      <span class="rl"><span>Votre outil.</span></span>
+      <span class="rl"><span>Vos règles.</span></span>
+      <span class="rl"><span class="acc">Vos données.</span></span>
+    </h1>
+    <button class="btn fade-up d3" onclick="location.href='#contact'">Construisons-le →</button>
+    <div class="micro fade-up d4">Cadrage · Prototype · Déploiement — en semaines, pas en trimestres</div>
+  </section>
+</div>
+
+<!-- PLAYER -->
+<div id="player">
+  <button id="pp" aria-label="Lecture / pause">
+    <svg id="ic-pause" viewBox="0 0 12 12"><rect x="1" y="1" width="3.4" height="10" rx="1"/><rect x="7.6" y="1" width="3.4" height="10" rx="1"/></svg>
+    <svg id="ic-play" viewBox="0 0 12 12" style="display:none"><path d="M2 1.2 L11 6 L2 10.8 Z"/></svg>
+  </button>
+  <div id="segs"></div>
+  <div id="scount">01/09</div>
+</div>
+
+<script>
+(function(){
+  /* ====== IDENTITÉ — changer le nom ici ====== */
+  const BRAND='NATIF';
+  document.getElementById('logo').textContent=BRAND;
+  document.getElementById('ctaname').textContent=BRAND;
+  document.getElementById('hudname').textContent=BRAND+' — FILM';
+  document.title=BRAND+' — Le film';
+
+  /* ====== grille de modules (scène "le constat") ====== */
+  const KEEP=['PIPELINE','CAMPAGNES','VEILLE','REPORTING'];
+  const NOISE=['CPQ','QUOTAS','TERRITOIRES','LOYALTY','TICKETS','CHATBOT','SOCIAL STUDIO','FORECAST+','SCORING v2','E-SIGN','MARKETPLACE','WORKFLOWS++','PORTAIL','FACTURATION','INVENTORY','RH SYNC','FIELD SERVICE','SURVEYS','ABM SUITE','DATA LAKE','GAMIFICATION','ADD-ON #47','ADD-ON #48','+ 92 AUTRES'];
+  const tiles=[];
+  // positions des modules conservés, dispersées dans la grille
+  const keepAt=[2,9,16,23];
+  let n=0,k=0;
+  for(let i=0;i<28;i++){
+    if(keepAt.includes(i)){ tiles.push({t:KEEP[k++],keep:true}); }
+    else{ tiles.push({t:NOISE[n++],keep:false}); }
+  }
+  const grid=document.getElementById('grid');
+  tiles.forEach((t,i)=>{
+    const d=document.createElement('div');
+    d.className='tile'+(t.keep?' keep':'');
+    d.style.setProperty('--i',i);
+    d.textContent=t.t;
+    grid.appendChild(d);
+  });
+
+  /* ====== player ====== */
+  const scenes=[
+    {el:'boot', dur:6200},
+    {el:'bloat',dur:9500},
+    {el:'sol',  dur:6800},
+    {el:'manif',dur:7000},
+    {el:'prod', dur:9500},
+    {el:'feat', dur:7200},
+    {el:'ia',   dur:6800},
+    {el:'souv', dur:8200},
+    {el:'cta',  dur:12000},
+  ];
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $=id=>document.getElementById(id);
+  const segsEl=$('segs');
+  scenes.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='seg';d.innerHTML='<i></i>';
+    d.addEventListener('click',()=>go(i,true));
+    segsEl.appendChild(d);
+  });
+  const segs=[...segsEl.children];
+
+  let idx=-1,playing=true,t0=0,elapsed=0,raf=null,timer=null,dimTimer=null;
+
+  function activate(i){
+    clearTimeout(dimTimer);
+    scenes.forEach((s,k)=>{
+      const el=$(s.el);
+      el.classList.toggle('on',k===i);
+      if(s.el==='bloat') el.classList.remove('dim');
+    });
+    segs.forEach((sg,k)=>{
+      const bar=sg.firstChild;
+      bar.style.transition='none';
+      bar.style.transform=k<i?'scaleX(1)':'scaleX(0)';
+    });
+    $('scount').textContent=String(i+1).padStart(2,'0')+'/'+String(scenes.length).padStart(2,'0');
+    if(scenes[i].el==='boot') runBoot();
+    if(scenes[i].el==='bloat'){
+      dimTimer=setTimeout(()=>{ if(idx===i) $('bloat').classList.add('dim'); }, reduced?100:3800);
+    }
+  }
+
+  function tick(){
+    if(!playing) return;
+    const now=performance.now();
+    const p=Math.min(1,(elapsed+now-t0)/scenes[idx].dur);
+    const bar=segs[idx].firstChild;
+    bar.style.transition='none';
+    bar.style.transform='scaleX('+p+')';
+    let ms=scenes.slice(0,idx).reduce((a,s)=>a+s.dur,0)+(elapsed+now-t0);
+    const sec=Math.floor(ms/1000);
+    $('hudtime').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+    raf=requestAnimationFrame(tick);
+  }
+
+  function schedule(){
+    clearTimeout(timer);cancelAnimationFrame(raf);
+    if(!playing)return;
+    t0=performance.now();
+    timer=setTimeout(()=>{go((idx+1)%scenes.length,false);},scenes[idx].dur-elapsed);
+    raf=requestAnimationFrame(tick);
+  }
+
+  function go(i,manual){
+    clearTimeout(timer);cancelAnimationFrame(raf);
+    idx=i;elapsed=0;
+    activate(i);
+    if(!(manual&&!playing)) schedule();
+  }
+
+  function setPlaying(p){
+    playing=p;
+    $('ic-pause').style.display=p?'':'none';
+    $('ic-play').style.display=p?'none':'';
+    if(p) schedule();
+    else{elapsed+=performance.now()-t0;clearTimeout(timer);cancelAnimationFrame(raf);}
+  }
+
+  $('pp').addEventListener('click',()=>setPlaying(!playing));
+  document.addEventListener('keydown',e=>{
+    if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}
+    if(e.code==='ArrowRight')go((idx+1)%scenes.length,true);
+    if(e.code==='ArrowLeft')go((idx-1+scenes.length)%scenes.length,true);
+  });
+  $('stage').addEventListener('click',e=>{
+    if(e.target.closest('#player')||e.target.closest('button'))return;
+    setPlaying(!playing);
+  });
+
+  const bootLines=[
+    ['init: chargement du module coordination',420],
+    ['sync: pipeline · campagnes · veille',520],
+    ['ia: copilote calibré sur vos données',520],
+    ['souveraineté: hébergement interne <span class="ok">[OK]</span>',560],
+    ['<span class="ok">SYSTÈME PRÊT.</span>',400],
+  ];
+  function runBoot(){
+    const term=$('term'),boot=$('boot');
+    boot.classList.remove('logo-in');
+    term.innerHTML='';
+    if(reduced){term.innerHTML=bootLines.map(l=>'&gt; '+l[0]).join('<br>');boot.classList.add('logo-in');return;}
+    let li=0;
+    (function next(){
+      if(idx!==0)return;
+      if(li>=bootLines.length){boot.classList.add('logo-in');return;}
+      const line=document.createElement('div');
+      line.innerHTML='&gt; '+bootLines[li][0];
+      line.classList.add('cur');
+      [...term.querySelectorAll('.cur')].forEach(c=>c.classList.remove('cur'));
+      term.appendChild(line);
+      setTimeout(next,bootLines[li++][1]);
+    })();
+  }
+
+  go(0,false);
+})();
+</script>
+</body>
+</html>
